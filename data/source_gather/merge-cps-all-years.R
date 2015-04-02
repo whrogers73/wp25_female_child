@@ -1,0 +1,54 @@
+
+require(survey)
+
+# Look up available years
+file_base <- "gather-data-cps-"
+file_names <- dir("data")
+file_names <- grep(file_base, file_names, value = TRUE)
+years <- gsub(file_base, "", file_names)
+years <- gsub(".RData", "", years)
+years <- years[rev(order(years))]
+
+# Recode
+cps_svy <- lapply(
+  years, function(year){
+    load(paste0("data/", file_base, year, ".RData"))
+    
+    # Recode
+    source("data/source_gather/merge-cps-all-years-recode-values.R", local = TRUE)
+    
+    # Survey design changes in 2004
+    # May want to create bootstrap replication weights for older versions
+    # Use the March Supplement Weights: marsupwt and the Fay type
+    if(year >= 2005){
+      cps <- svrepdesign(
+        ids = ~ id_person, 
+        weights = ~ marsupwt, 
+        repweights = "pwwgt[1-9]", 
+        type = "Fay", 
+        rho = (1-1/sqrt(4)),
+        data = cps,
+        combined.weights = TRUE
+      )
+    }else{
+      cps <- svydesign(
+        ids = ~ id_person, 
+        weights = ~ marsupwt, 
+        data = cps,
+      )
+    }
+    
+    # Matches Anne's work
+    cps <- subset(
+      cps, 
+      a_ftlf == 1 & a_age >= 18 & a_sex == 2
+      )
+    
+    return(cps)
+  }
+)
+
+names(cps_svy) <- years
+
+save(cps_svy, file = "data/main-data-cps-all-years.RData")
+
