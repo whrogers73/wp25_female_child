@@ -4,7 +4,7 @@ library(parallel)
 
 load("data/main-data-cps-all-years.RData")
 
-cl <- makeCluster(6)
+cl <- makeCluster(7)
 clusterEvalQ(cl, library(survey))
 
 tbl_age_group <- parLapply(
@@ -25,7 +25,10 @@ tbl_age_group <- lapply(
   names(tbl_age_group), 
   function(x){transform(tbl_age_group[[x]], year = as.numeric(x))}
   )
+
 tbl_age_group <- do.call("rbind", tbl_age_group)
+
+
 
 mdl_fun_a <- pearnval ~ edu_rcd + a_age + I(a_age ^ 2)
 mdl_fun_b <- pearnval ~ edu_rcd + hh_rcd + a_age + I(a_age ^ 2)
