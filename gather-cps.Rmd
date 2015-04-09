@@ -1,16 +1,23 @@
-#==============================================================================#
-# Extract data for wp25_female_child
+---
+title: "Gather CPS"
+author: "William H. Rogers"
+date: "April 9, 2015"
+output: html_document
+---
 
+# Objective
+  *  C
+
+# Import Packages
+
+```{r packages}
 path_location <- "K:/whr/work/research/basic_data_extract/cps/"
-
-
-# Preample ----------------------------------------------------------------
+years <- c(2014:1996, 1994:1992)
 
 library(dplyr)
+```
 
-
-# Variables ---------------------------------------------------------------
-
+```{r variables}
 vars <- c(
   "ph_seq",         # Household seq number
   "pppos",          # Record type and sequence indicator
@@ -27,16 +34,14 @@ vars <- c(
   "a_sex", 
   "ptotval",        # Total income from all sources
   "pearnval"       # Total earnings from all sources
-)
+  )
+```
 
-
-# Connection ---------------------------------------------------------------
-
+```{r connection}
 db_conn <- src_sqlite(path = paste0(path_location, "data/cps-asec.db"))
+```
 
-
-# Extract and Save ---------------------------------------------------------
-years <- c(2014:1996, 1994:1992)
+```{r extract}
 for(i in years){
   if(i >= 2005){ # No Replication weights before 2004
     cps <- tbl(db_conn, paste0("asec", i)) %>% 
@@ -57,5 +62,5 @@ for(i in years){
   }
   save(cps, file = paste0("data/gather-data-cps-", i, ".RData"))
 }
-
+```
 

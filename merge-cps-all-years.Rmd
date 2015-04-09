@@ -1,6 +1,20 @@
+---
+title: "Merge CPS"
+author: "William H. Rogers"
+date: "April 9, 2015"
+output: html_document
+---
 
+# Objective
+  *  C
+
+# Import Data and Packages
+
+```{r packages}
 require(survey)
+```
 
+```{r}
 # Look up available years
 file_base <- "gather-data-cps-"
 file_names <- dir("data")
@@ -51,4 +65,6 @@ cps_svy <- lapply(
 names(cps_svy) <- years
 
 save(cps_svy, file = "data/main-data-cps-all-years.RData")
+```
+
 
